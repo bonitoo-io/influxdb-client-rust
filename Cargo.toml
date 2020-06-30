@@ -1,0 +1,14 @@
+[package]
+name = "influxdb_client_rust"
+version = "0.1.0"
+authors = ["Jakub Bednar <jakub.bednar@gmail.com>"]
+edition = "2018"
+description = "InfluxDB (v2+) Client Library for Rust"
+keywords = ["influxdb",  "influxdata",  "flux",  "rust", "timeseries"]
+homepage = "https://github.com/bonitoo-io/influxdb-client-rust"
+license-file = "LICENSE"
+readme = "README.md"
+documentation = "https://docs.rs/influxdb_client_rust/"
+repository = "https://github.com/bonitoo-io/influxdb-client-rust"
+
+[dependencies]

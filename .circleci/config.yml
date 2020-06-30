@@ -1,0 +1,121 @@
+version: 2.1
+
+commands:
+  influxdb-onboarding:
+    steps:
+      - run:
+          name: "Post onBoarding request to InfluxDB 2"
+          command: ./bin/influxdb-onboarding.sh
+  prepare:
+    description: "Prepare environment to tests"
+    steps:
+      - checkout
+      # - influxdb-onboarding
+  test:
+    parameters:
+      rust-image:
+        type: string
+    steps:
+      - restore_cache:
+          name: Restoring Cargo Cache
+          keys:
+            - &cache-key cargo-deps-v1-{{ checksum "Cargo.lock" }}-<< parameters.rust-image >>
+            - cargo-deps-v1-{{ checksum "Cargo.lock" }}
+            - cargo-deps-v1-
+      - run:
+          name: Install dependencies
+          command: cargo fetch --locked
+      - run:
+          name: Run tests
+          command: make test-ci
+      - save_cache:
+          name: Saving Cargo Cache
+          key: *cache-key
+          paths:
+            - /usr/local/cargo/registry/cache
+          when: always
+  storing-test-results:
+    steps:
+      - store_test_results:
+          path: .
+
+jobs:
+  tests-rust:
+    parameters:
+      rust-image:
+        type: string
+        default: &default-rust-image "circleci/rust:1.44"
+      influxdb-image:
+        type: string
+        default: &default-influxdb-image "influxdb:2.0.0-beta"
+    docker:
+      - image: << parameters.rust-image >>
+      - image: &influx-image quay.io/influxdb/<< parameters.influxdb-image >>
+    steps:
+      - prepare
+      - test:
+          rust-image: << parameters.rust-image >>
+      - storing-test-results
+
+  check:
+    parameters:
+      make_command:
+        type: string
+        default: "check-fmt"
+    docker:
+      - image: *default-rust-image
+    steps:
+      - checkout
+      - run: make << parameters.make_command >>
+
+  deploy-preview:
+    parameters:
+      influxdb-image:
+        type: string
+        default: *default-influxdb-image
+    docker:
+      - image: *default-rust-image
+      - image: *influx-image
+    steps:
+      - run:
+          name: Early return if this build is from a forked repository
+          command: |
+            if [[ $CIRCLE_PROJECT_USERNAME != "bonitoo-io" ]]; then
+              echo "Nothing to do for forked repositories, so marking this step successful"
+              circleci step halt
+            fi
+      - checkout
+      - run:
+          name: TODO
+          command: echo "TODO"
+workflows:
+  version: 2
+  build:
+    jobs:
+      - check:
+          name: fmt
+          make_command: check-fmt
+      - check:
+          name: check-cargo
+          make_command: check-cargo
+      - tests-rust:
+          name: test-rust-1.44
+      - deploy-preview:
+          requires:
+            - fmt
+            - check-cargo
+            - test-rust-1.44
+          filters:
+            branches:
+              only: master
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - tests-rust
