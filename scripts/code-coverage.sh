@@ -15,7 +15,9 @@ wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
   make install DESTDIR=../../kcov-build &&
   cd ../.. &&
   rm -rf kcov-master &&
+  cargo build &&
   cargo test &&
+  ls target/debug &&
   for file in target/debug/influxdb_client_rust-*[^\.d]; do [ -x "${file}" ] || continue; mkdir -p "target/cov/$(basename $file)"; ./kcov-build/usr/local/bin/kcov-system-daemon --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
   bash <(curl -s https://codecov.io/bash) &&
   echo "Uploaded code coverage"
