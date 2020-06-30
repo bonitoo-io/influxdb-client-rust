@@ -77,6 +77,16 @@ jobs:
           rust-image: *default-rust-image
       - run: make << parameters.make_command >>
 
+  code-coverage:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: coverage with tarpaulin
+          command: |
+            make coverage-ci
+            bash <(curl -s https://codecov.io/bash)
+
   deploy-preview:
     parameters:
       influxdb-image:
@@ -107,12 +117,14 @@ workflows:
       - check:
           name: check-cargo
           make_command: check-cargo
+      - code-coverage
       - tests-rust:
           name: test-rust-1.44
       - deploy-preview:
           requires:
             - check-fmt
             - check-cargo
+            - code-coverage
             - test-rust-1.44
           filters:
             branches:
