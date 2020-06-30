@@ -22,7 +22,7 @@ test-ci: ## Run tests with XML output
 	cargo junit --name junit.xml
 
 coverage-ci: ## Report CodeCoverage to CodeCov - https://github.com/codecov/example-rust
-	apt-get install cmake -y
+	sudo apt-get install cmake -y
 	./scripts/code-coverage.sh
 
 check: check-fmt test ## Check all
