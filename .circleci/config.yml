@@ -11,7 +11,7 @@ commands:
     steps:
       - checkout
       # - influxdb-onboarding
-  test:
+  restore-cache:
     parameters:
       rust-image:
         type: string
@@ -22,9 +22,16 @@ commands:
             - &cache-key cargo-deps-v1-{{ checksum "Cargo.lock" }}-<< parameters.rust-image >>
             - cargo-deps-v1-{{ checksum "Cargo.lock" }}
             - cargo-deps-v1-
+  test:
+    parameters:
+      rust-image:
+        type: string
+    steps:
+      - restore-cache:
+          rust-image: << parameters.rust-image >>
       - run:
           name: Install dependencies
-          command: cargo fetch --locked
+          command: cargo fetch
       - run:
           name: Run tests
           command: make test-ci
@@ -66,6 +73,8 @@ jobs:
       - image: *default-rust-image
     steps:
       - checkout
+      - restore-cache:
+          rust-image: *default-rust-image
       - run: make << parameters.make_command >>
 
   deploy-preview:
