@@ -21,7 +21,7 @@ test-ci: ## Run tests with XML output
 	cargo install cargo-junit
 	cargo junit --name junit.xml
 
-coverage-ci: test ## Report CodeCoverage to CodeCov - https://github.com/codecov/example-rust
+coverage-ci: ## Report CodeCoverage to CodeCov - https://github.com/codecov/example-rust
 	sudo apt-get install cmake -y
 	./scripts/code-coverage.sh
 
