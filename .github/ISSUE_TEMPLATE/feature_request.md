@@ -1,20 +1,28 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
-
+about: Opening a feature request kicks off a discussion
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+<!--
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Thank you for suggesting an idea to improve this client. 
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+* Please add a :+1: or comment on a similar existing feature request instead of opening a new one.
+https://github.com/bonitoo-io/influxdb-client-rust/issues?q=is%3Aissue+is%3Aopen+is%3Aclosed+sort%3Aupdated-desc
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+-->
+
+**Proposal:**
+Short summary of the feature.
+
+**Current behavior:**
+Describe what currently happens.
+
+**Desired behavior:**
+Describe what you want.
+
+**Alternatives considered:**
+Describe other solutions or features you considered.
+
+**Use case:**
+Why is this important (helps with prioritizing requests)?
