@@ -19,8 +19,8 @@ commands:
       - restore_cache:
           name: Restoring Cargo Cache
           keys:
-            - &cache-key cargo-deps-v1-{{ checksum "Cargo.lock" }}-<< parameters.rust-image >>
-            - cargo-deps-v1-{{ checksum "Cargo.lock" }}
+            - &cache-key cargo-deps-v1-{{ checksum "Cargo.toml" }}-<< parameters.rust-image >>
+            - cargo-deps-v1-{{ checksum "Cargo.toml" }}
             - cargo-deps-v1-
   test:
     parameters:
