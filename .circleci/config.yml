@@ -107,12 +107,16 @@ workflows:
       - check:
           name: check-cargo
           make_command: check-cargo
+      - check:
+          name: code-coverage
+          make_command: coverage-ci
       - tests-rust:
           name: test-rust-1.44
       - deploy-preview:
           requires:
             - check-fmt
             - check-cargo
+            - code-coverage
             - test-rust-1.44
           filters:
             branches:
