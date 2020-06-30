@@ -102,7 +102,7 @@ workflows:
   build:
     jobs:
       - check:
-          name: fmt
+          name: check-fmt
           make_command: check-fmt
       - check:
           name: check-cargo
@@ -111,7 +111,7 @@ workflows:
           name: test-rust-1.44
       - deploy-preview:
           requires:
-            - fmt
+            - check-fmt
             - check-cargo
             - test-rust-1.44
           filters:
