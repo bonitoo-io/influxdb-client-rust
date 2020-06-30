@@ -15,4 +15,4 @@ exec docker run \
     --verbose \
     --exclude-files 'tests/*' \
     --exclude-files 'main.rs' \
-    "$@"
+    --out Xml

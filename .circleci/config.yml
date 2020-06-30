@@ -84,7 +84,7 @@ jobs:
       - run:
           name: coverage with tarpaulin
           command: |
-            ./coverage.sh --out Xml
+            make coverage-ci
             bash <(curl -s https://codecov.io/bash)
 
   deploy-preview:
