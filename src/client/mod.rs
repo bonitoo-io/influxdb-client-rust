@@ -1,3 +1,5 @@
+use crate::generated::models::write_precision::WritePrecision;
+
 /// The client is the entry point to HTTP API defined
 /// in https://github.com/influxdata/influxdb/blob/master/http/swagger.yml.
 #[derive(Clone, Debug)]
@@ -10,14 +12,13 @@ pub struct Client {
     org: Option<String>,
     /// The default destination bucket for writes.
     bucket: Option<String>,
-    //TODO to generated code
     /// The default precision for the unix timestamps within.
-    precision: Option<String>,
+    precision: Option<WritePrecision>,
     //TODO timeout or client
 }
 
 impl Client {
-    /// Instantiate a new [`Client`](struct.Client.html).
+    /// Instantiate a new [`Client`](struct.Client.html). The default client precision is [`WritePrecision::Ns`](generated/models/write_precision/enum.WritePrecision.html#variant.Ns).
     ///
     /// # Arguments
     ///
@@ -28,6 +29,7 @@ impl Client {
     ///
     /// ```
     /// use influxdb_client_rust::Client;
+    ///
     /// let client = Client::new("http://localhost:9999", "my-token");
     /// ```
     pub fn new<T1, T2>(url: T1, token: T2) -> Self
@@ -40,7 +42,7 @@ impl Client {
             token: token.into(),
             org: None,
             bucket: None,
-            precision: None,
+            precision: Some(WritePrecision::Ns),
         }
     }
 
@@ -54,6 +56,7 @@ impl Client {
     ///
     /// ```
     /// use influxdb_client_rust::Client;
+    ///
     /// let client = Client::new("http://localhost:9999", "my-token").with_org("my-org");
     /// ```
     pub fn with_org<T>(mut self, org: T) -> Self
@@ -74,6 +77,7 @@ impl Client {
     ///
     /// ```
     /// use influxdb_client_rust::Client;
+    ///
     /// let client = Client::new("http://localhost:9999", "my-token").with_bucket("my-bucket");
     /// ```
     pub fn with_bucket<T>(mut self, bucket: T) -> Self
@@ -83,10 +87,33 @@ impl Client {
         self.bucket = Some(bucket.into());
         self
     }
+
+    /// Add default precision to [`Client`](struct.Client.html).
+    ///
+    /// # Arguments
+    ///
+    /// * `precision` - The default precision for the unix timestamps within [`WritePrecision`](generated/models/write_precision/enum.WritePrecision.html).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use influxdb_client_rust::Client;
+    /// use influxdb_client_rust::generated::models::WritePrecision;
+    ///
+    /// let client = Client::new("http://localhost:9999", "my-token").with_precision(WritePrecision::S);
+    /// ```
+    pub fn with_precision<T>(mut self, precision: T) -> Self
+    where
+        T: Into<WritePrecision>,
+    {
+        self.precision = Some(precision.into());
+        self
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::generated::models::write_precision::WritePrecision;
     use crate::Client;
 
     #[test]
@@ -94,7 +121,7 @@ mod tests {
         let client = Client::new("http://localhost:9999", "my-token");
         assert_eq!(client.org, None);
         assert_eq!(client.bucket, None);
-        assert_eq!(client.precision, None);
+        assert_eq!(client.precision.unwrap(), WritePrecision::Ns);
     }
 
     #[test]
@@ -121,5 +148,13 @@ mod tests {
         let client = Client::new("http://localhost:9999", "my-token").with_bucket("my-bucket");
         assert!(client.bucket.is_some());
         assert_eq!(client.bucket.unwrap(), "my-bucket");
+    }
+
+    #[test]
+    fn test_precision() {
+        let client =
+            Client::new("http://localhost:9999", "my-token").with_precision(WritePrecision::S);
+        assert!(client.precision.is_some());
+        assert_eq!(client.precision.unwrap(), WritePrecision::S);
     }
 }

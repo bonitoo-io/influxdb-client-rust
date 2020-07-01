@@ -7,6 +7,8 @@ help:
 	
 fmt: ## Format code
 	cargo fmt
+
+check: check-fmt check-clippy check-cargo test ## Check all
 	
 check-fmt: ## Check format of code
 	cargo fmt -- --check
@@ -27,4 +29,5 @@ test-ci: ## Run tests with XML output
 coverage-ci: ## Report CodeCoverage to CodeCov - https://github.com/codecov/example-rust
 	./scripts/code-coverage.sh
 
-check: check-fmt check-clippy check-cargo test ## Check all
+generate-sources: ## Generate sources from https://github.com/influxdata/influxdb/blob/master/http/swagger.yml
+	./scripts/generate-sources.sh
