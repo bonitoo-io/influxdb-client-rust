@@ -14,6 +14,9 @@ check-fmt: ## Check format of code
 check-cargo: ## Check the current package
 	cargo check
 
+check-clippy: ## Check by Clippy
+	cargo clippy --all-targets --all-features -- -D warnings
+
 test: ## Run tests
 	cargo test
 
@@ -24,4 +27,4 @@ test-ci: ## Run tests with XML output
 coverage-ci: ## Report CodeCoverage to CodeCov - https://github.com/codecov/example-rust
 	./scripts/code-coverage.sh
 
-check: check-fmt test ## Check all
+check: check-fmt check-clippy check-cargo test ## Check all

@@ -117,6 +117,9 @@ workflows:
       - check:
           name: check-cargo
           make_command: check-cargo
+      - check:
+          name: check-clippy
+          make_command: check-clippy
       - code-coverage
       - tests-rust:
           name: test-rust-1.44
@@ -124,6 +127,7 @@ workflows:
           requires:
             - check-fmt
             - check-cargo
+            - check-clippy
             - code-coverage
             - test-rust-1.44
           filters:
