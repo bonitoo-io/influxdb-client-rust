@@ -22,6 +22,12 @@ commands:
             - &cache-key cargo-deps-v1-{{ checksum "Cargo.toml" }}-<< parameters.rust-image >>
             - cargo-deps-v1-{{ checksum "Cargo.toml" }}
             - cargo-deps-v1-
+  rust-toolchain:
+    steps:
+      - run:
+          name: Set up Rust toolchain
+          command: |
+            rustup component add clippy
   test:
     parameters:
       rust-image:
@@ -75,7 +81,7 @@ jobs:
       - checkout
       - restore-cache:
           rust-image: *default-rust-image
-      - run: rustup component add clippy
+      - rust-toolchain
       - run: make << parameters.make_command >>
 
   code-coverage:
