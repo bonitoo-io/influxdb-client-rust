@@ -75,6 +75,7 @@ jobs:
       - checkout
       - restore-cache:
           rust-image: *default-rust-image
+      - run: rustup component add clippy
       - run: make << parameters.make_command >>
 
   code-coverage:
