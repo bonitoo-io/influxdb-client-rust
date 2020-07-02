@@ -14,7 +14,8 @@ pub struct Client {
     bucket: Option<String>,
     /// The default precision for the unix timestamps within.
     precision: Option<WritePrecision>,
-    //TODO timeout or client
+    /// The HTTP client.
+    http_client: reqwest::Client,
 }
 
 impl Client {
@@ -43,6 +44,7 @@ impl Client {
             org: None,
             bucket: None,
             precision: Some(WritePrecision::Ns),
+            http_client: Client::build_http_client(),
         }
     }
 
@@ -109,6 +111,15 @@ impl Client {
         self.precision = Some(precision.into());
         self
     }
+
+    fn build_http_client() -> reqwest::Client {
+        static APP_USER_AGENT: &str = concat!("influxdb-client-rust/", env!("CARGO_PKG_VERSION"));
+
+        reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            .build()
+            .unwrap()
+    }
 }
 
 #[cfg(test)]
@@ -121,6 +132,7 @@ mod tests {
         let client = Client::new("http://localhost:9999", "my-token");
         assert_eq!(client.org, None);
         assert_eq!(client.bucket, None);
+        assert!(client.precision.is_some());
         assert_eq!(client.precision.unwrap(), WritePrecision::Ns);
     }
 

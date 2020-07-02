@@ -12,4 +12,5 @@ documentation = "https://docs.rs/influxdb_client_rust/"
 repository = "https://github.com/bonitoo-io/influxdb-client-rust"
 
 [dependencies]
-serde = { version = "1.0.114", features = ["derive"] }
+serde = { version = "^1.0.114", features = ["derive"] }
+reqwest = { version = "^0.10.6", features = ["json"] }
