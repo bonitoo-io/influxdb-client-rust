@@ -23,7 +23,7 @@ pub struct Client {
     /// The default destination bucket for writes.
     bucket: Option<String>,
     /// The default precision for the unix timestamps within.
-    precision: Option<WritePrecision>,
+    precision: WritePrecision,
     /// The HTTP client.
     http_client: HttpClient,
 }
@@ -169,7 +169,7 @@ impl Client {
     where
         WP: Into<WritePrecision>,
     {
-        self.precision = Some(precision.into());
+        self.precision = precision.into();
         self
     }
 
@@ -203,7 +203,7 @@ impl Client {
             auth: auth.into(),
             org: None,
             bucket: None,
-            precision: Some(WritePrecision::Ns),
+            precision: WritePrecision::Ns,
             http_client: Client::build_http_client(),
         }
     }
@@ -233,8 +233,7 @@ mod tests {
         let client = Client::new("http://localhost:9999", "my-token");
         assert_eq!(client.org, None);
         assert_eq!(client.bucket, None);
-        assert!(client.precision.is_some());
-        assert_eq!(client.precision.unwrap(), WritePrecision::Ns);
+        assert_eq!(client.precision, WritePrecision::Ns);
     }
 
     #[test]
@@ -274,8 +273,7 @@ mod tests {
     fn test_precision() {
         let client =
             Client::new("http://localhost:9999", "my-token").with_precision(WritePrecision::S);
-        assert!(client.precision.is_some());
-        assert_eq!(client.precision.unwrap(), WritePrecision::S);
+        assert_eq!(client.precision, WritePrecision::S);
     }
 
     #[test]
@@ -298,8 +296,7 @@ mod tests {
         assert_eq!(client.org.unwrap(), "-");
         assert!(client.bucket.is_some());
         assert_eq!(client.bucket.unwrap(), "telegraf/autogen");
-        assert!(client.precision.is_some());
-        assert_eq!(client.precision.unwrap(), WritePrecision::Ns);
+        assert_eq!(client.precision, WritePrecision::Ns);
     }
 
     #[tokio::test]
