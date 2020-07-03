@@ -7,7 +7,7 @@ docker run --rm -v "${SCRIPT_PATH}/../:/local" openapitools/openapi-generator-cl
     -i https://raw.githubusercontent.com/influxdata/influxdb/master/http/swagger.yml \
     -g rust \
     -o /local/tmp_generated/ \
-    --additional-properties=library=reqwest
+    --library "reqwest"
 
 # Keep only required
 cd "${SCRIPT_PATH}"/../tmp_generated/src/models || exit

@@ -26,6 +26,33 @@ influxdb_client_rust = "1.0.0-alpha"
 
 ## Usage
 
+### Creating a client
+
+Use **influxdb_client_rust::Client::new** to create a client connected to a running InfluxDB 2 instance authorized by `token`.
+
+```rust
+use influxdb_client_rust::Client;
+ 
+let client = Client::new("http://localhost:9999", "my-token");
+```
+
+#### Client Options
+
+| Option | Description | Type | Default |
+|---|---|---|---|
+| bucket | Default destination bucket for writes | String | none |
+| org | Default organization bucket for writes | String | none |
+| precision | Default precision for the unix timestamps within the body line-protocol | WritePrecision | ns |
+
+```rust
+use influxdb_client_rust::Client;
+use influxdb_client_rust::generated::models::WritePrecision;
+
+let client = Client::new("http://localhost:9999", "my-token")
+    .with_bucket("my-bucket")
+    .with_org("my-org")
+    .with_precision(WritePrecision::S);
+```
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/bonitoo-io/influxdb-client-rust.

@@ -31,3 +31,7 @@ coverage-ci: ## Report CodeCoverage to CodeCov - https://github.com/codecov/exam
 
 generate-sources: ## Generate sources from https://github.com/influxdata/influxdb/blob/master/http/swagger.yml
 	./scripts/generate-sources.sh
+
+generate-doc: ## Generate and open Documentation
+	cargo doc
+	open target/doc/influxdb_client_rust/index.html
