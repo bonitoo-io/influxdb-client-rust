@@ -14,6 +14,7 @@ This repository contains the reference Rust client for the InfluxDB 2.0.
 #### Disclaimer: This library is a work in progress and should not be considered production ready yet.
 
 ## Features
+- [Supports InfluxDB 1.8 v2 compatibility endpoints](#influxdb-18-api-compatibility)
 
 ## Installation
 
