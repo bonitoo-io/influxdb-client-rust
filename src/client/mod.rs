@@ -9,7 +9,9 @@ struct Auth {
 }
 
 /// The client is the entry point to HTTP API defined
-/// in https://github.com/influxdata/influxdb/blob/master/http/swagger.yml.
+/// in [swagger.yml](https://github.com/influxdata/influxdb/blob/master/http/swagger.yml).
+///
+/// The default client precision is [`WritePrecision::Ns`](generated/models/write_precision/enum.WritePrecision.html#variant.Ns).
 #[derive(Clone, Debug)]
 pub struct Client {
     /// InfluxDB URL to connect to (ex. `http://localhost:9999`).
@@ -27,7 +29,7 @@ pub struct Client {
 }
 
 impl Client {
-    /// Instantiate a new [`Client`](struct.Client.html). The default client precision is [`WritePrecision::Ns`](generated/models/write_precision/enum.WritePrecision.html#variant.Ns).
+    /// Instantiate a new [`Client`](struct.Client.html) authenticate by [token](https://v2.docs.influxdata.com/v2.0/security/tokens/).
     ///
     /// # Arguments
     ///
@@ -41,7 +43,7 @@ impl Client {
     ///
     /// let client = Client::new("http://localhost:9999", "my-token");
     /// ```
-    ///
+    /// ## Configure default `Bucket`, `Organization` and `Precision`
     /// ```
     /// use influxdb_client_rust::Client;
     /// use influxdb_client_rust::generated::models::WritePrecision;
@@ -51,28 +53,60 @@ impl Client {
     ///     .with_org("my-org")
     ///     .with_precision(WritePrecision::S);
     /// ```
-    pub fn new<T1, T2>(url: T1, token: T2) -> Self
+    pub fn new<S1, S2>(url: S1, token: S2) -> Self
     where
-        T1: Into<String>,
-        T2: Into<String>,
+        S1: Into<String>,
+        S2: Into<String>,
     {
-        let url = match Url::parse(&url.into()) {
-            Ok(url) => url,
-            Err(err) => panic!(format!("{}", err)),
-        };
-
         let auth = Auth {
             authorization_header: Some(format!("Token {}", &token.into())),
         };
 
-        Client {
-            url,
-            auth,
-            org: None,
-            bucket: None,
-            precision: Some(WritePrecision::Ns),
-            http_client: Client::build_http_client(),
-        }
+        Client::build_client(url, auth)
+    }
+
+    /// Instantiate a new [`Client`](struct.Client.html) for InfluxDB 1.8 compatibility API.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - InfluxDB URL to connect to (ex. `http://localhost:9999`).
+    /// * `username` - Username for authentication.
+    /// * `password` - Password for authentication.
+    /// * `database` - Target database.
+    /// * `retention_policy` - Target retention policy.
+    ///
+    /// # Example
+    /// ```
+    /// use influxdb_client_rust::Client;
+    ///
+    /// let client = Client::new_v1("http://localhost:8086",
+    ///     "my-user",
+    ///     "my-password",
+    ///     "telegraf",
+    ///     "autogen"
+    /// );
+    /// ```
+    pub fn new_v1<S1, S2, S3, S4, S5>(
+        url: S1,
+        username: S2,
+        password: S3,
+        database: S4,
+        retention_policy: S5,
+    ) -> Self
+    where
+        S1: Into<String>,
+        S2: Into<String>,
+        S3: Into<String>,
+        S4: Into<String>,
+        S5: Into<String>,
+    {
+        let auth = Auth {
+            authorization_header: Some(format!("Token {}:{}", &username.into(), &password.into())),
+        };
+
+        Client::build_client(url, auth)
+            .with_org("-")
+            .with_bucket(format!("{}/{}", &database.into(), &retention_policy.into()))
     }
 
     /// Add org to [`Client`](struct.Client.html).
@@ -150,7 +184,27 @@ impl Client {
         if let Some(i) = &self.auth.authorization_header {
             request.header(header::AUTHORIZATION, i)
         } else {
-            request
+            request.basic_auth("r", Some("d"))
+        }
+    }
+
+    fn build_client<S, A>(url: S, auth: A) -> Client
+    where
+        S: Into<String>,
+        A: Into<Auth>,
+    {
+        let url = match Url::parse(&url.into()) {
+            Ok(url) => url,
+            Err(err) => panic!(format!("{}", err)),
+        };
+
+        Client {
+            url,
+            auth: auth.into(),
+            org: None,
+            bucket: None,
+            precision: Some(WritePrecision::Ns),
+            http_client: Client::build_http_client(),
         }
     }
 
@@ -222,6 +276,30 @@ mod tests {
             Client::new("http://localhost:9999", "my-token").with_precision(WritePrecision::S);
         assert!(client.precision.is_some());
         assert_eq!(client.precision.unwrap(), WritePrecision::S);
+    }
+
+    #[test]
+    fn test_v1() {
+        let client = Client::new_v1(
+            "http://localhost:8086",
+            "my-user",
+            "my-password",
+            "telegraf",
+            "autogen",
+        );
+
+        assert_eq!(client.url, Url::parse("http://localhost:8086").unwrap());
+        assert!(client.auth.authorization_header.is_some());
+        assert_eq!(
+            client.auth.authorization_header.unwrap(),
+            "Token my-user:my-password"
+        );
+        assert!(client.org.is_some());
+        assert_eq!(client.org.unwrap(), "-");
+        assert!(client.bucket.is_some());
+        assert_eq!(client.bucket.unwrap(), "telegraf/autogen");
+        assert!(client.precision.is_some());
+        assert_eq!(client.precision.unwrap(), WritePrecision::Ns);
     }
 
     #[tokio::test]
