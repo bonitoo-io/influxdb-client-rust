@@ -15,7 +15,7 @@ pub struct HealthCheck {
     #[serde(rename = "message", skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     #[serde(rename = "checks", skip_serializing_if = "Option::is_none")]
-    pub checks: Option<Vec<crate::models::HealthCheck>>,
+    pub checks: Option<Vec<crate::generated::models::HealthCheck>>,
     #[serde(rename = "status")]
     pub status: Status,
     #[serde(rename = "version", skip_serializing_if = "Option::is_none")]
