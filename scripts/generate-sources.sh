@@ -11,7 +11,7 @@ docker run --rm -v "${SCRIPT_PATH}/../:/local" openapitools/openapi-generator-cl
 
 # Keep only required
 cd "${SCRIPT_PATH}"/../tmp_generated/src/models || exit
-rm -r $(ls | grep -v "\<write_precision.rs\>\|\<dialect.rb\>\|\<query.rb\>\|\<delete_predicate_request.rb\>")
+rm -r $(ls | grep -v "\<write_precision.rs\>\|\<health_check.rs\>\|\<query.rb\>\|\<delete_predicate_request.rb\>")
 
 # Move sources
 mv "${SCRIPT_PATH}"/../tmp_generated/src/models/*.rs "${SCRIPT_PATH}"/../src/generated/models
@@ -20,4 +20,3 @@ mv "${SCRIPT_PATH}"/../tmp_generated/src/models/*.rs "${SCRIPT_PATH}"/../src/gen
 rm -rf "${SCRIPT_PATH}"/../tmp_generated/*
 
 cd "${SCRIPT_PATH}"/../
-make fmt
