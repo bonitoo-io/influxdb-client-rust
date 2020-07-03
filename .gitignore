@@ -10,5 +10,6 @@ Cargo.lock
 **/*.rs.bk
 /junit.xml
 /.idea/
+/tmp_generated/
 /cobertura.xml
 /TODO.md
